@@ -26,3 +26,25 @@ def create(project_request: ProjectRequest, db: Session = Depends(get_db)):
     project = Project(**project_request.__dict__)
     project = ProjectRepository.save(db, project)
     return ProjectResponse(**project.__dict__)
+
+@router.put("/projects/{id}", response_model=ProjectResponse, status_code=status.HTTP_200_OK, name="update_project", tags=["projects"])
+def update(id: int, project_request: ProjectRequest, db: Session = Depends(get_db)):
+    project = ProjectRepository.get_by_id(db, id)
+    if project is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Projeto não encontrado.")
+    project = Project(**project_request.__dict__)
+    project = ProjectRepository.update(db, project)
+    return ProjectResponse(**project.__dict__)
+
+@router.delete("/projects/{id}", status_code=status.HTTP_204_NO_CONTENT, name="delete_project", tags=["projects"])
+def delete(id: int, db: Session = Depends(get_db)):
+    project = ProjectRepository.get_by_id(db, id)
+    if project is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Projeto não encontrado.")
+    ProjectRepository.delete(db, project)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.delete("/projects", status_code=status.HTTP_204_NO_CONTENT, name="delete_all_projects", tags=["projects"])
+def delete_all(db: Session = Depends(get_db)):
+    ProjectRepository.delete_all(db)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

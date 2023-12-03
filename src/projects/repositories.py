@@ -44,3 +44,8 @@ class ProjectRepository:
         db.delete(project)
         db.commit()
         return project
+    
+    @staticmethod
+    def delete_all(db: Session) -> None:
+        db.query(Project).delete()
+        db.commit()
